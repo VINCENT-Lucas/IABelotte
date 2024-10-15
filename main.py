@@ -17,9 +17,4 @@ partie.ajouter_joueurs(liste_joueurs)
 
 paquet.afficher()
 
-partie.distribuer_cartes(paquet)
-
-j1.montrer_main()
-j2.montrer_main()
-j3.montrer_main()
-j4.montrer_main()
+partie.partie(paquet)
