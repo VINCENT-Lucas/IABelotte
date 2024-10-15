@@ -2,7 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from Partie import *
 
-carte_jouee = None
+carte_selectionnee = None
 DIM_CARTE = (100, 150)
 
 def charger_image_dos_carte(dos_carte):
@@ -12,9 +12,9 @@ def charger_image_dos_carte(dos_carte):
     return ImageTk.PhotoImage(dos_image)
 
 def carte_selectionnee(root, carte):
-    global carte_jouee
+    global carte_selectionnee
     """Fonction appelée lorsque l'utilisateur clique sur une carte."""
-    carte_jouee = carte  # Remplacez par une action souhaitée
+    carte_selectionnee = carte  # Remplacez par une action souhaitée
     root.destroy()
 
 def afficher_main_joueur(root, frame, main):
@@ -82,12 +82,28 @@ def afficher_main(main_joueur):
     frame_sud.pack(side="bottom", pady=10)
     afficher_main_joueur(root, frame_sud, main_joueur)
 
-    nb_cartes = len(main_joueur)
+    nb_cartes = 6
     afficher_cartes_nord(root, dos_photo, nb_cartes)
     afficher_cartes_est(root, dos_photo, nb_cartes)
     afficher_cartes_ouest(root, dos_photo, nb_cartes)
 
     # Lancer l'application
     root.mainloop()
-    return carte_jouee
+    return carte_selectionnee
     
+
+partie = Partie()
+
+j1 = Joueur("J1")
+j2 = Joueur("J2")
+j3 = Joueur("J3")
+j4 = Joueur("J4")
+
+liste_joueurs = [j1, j2, j3, j4]
+partie.ajouter_joueurs(liste_joueurs)
+paquet = Paquet()
+paquet.melanger()
+partie.distribuer_cartes(paquet)
+# Exemple d'utilisation
+liste_de_cartes = j1.main # Liste de cartes à afficher
+c = afficher_main(liste_de_cartes)

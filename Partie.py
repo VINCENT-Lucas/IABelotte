@@ -1,6 +1,7 @@
 from Carte import *
 from Paquet import *
 from Joueur import *
+from Robot import *
 
 class Partie:
     def __init__(self, liste_joueurs=[]) -> None:

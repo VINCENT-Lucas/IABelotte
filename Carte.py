@@ -3,6 +3,9 @@ class Carte:
         self.valeur = str(valeur)
         self.symbole = str(symbole)
     
+    def get_image(self):
+        return f"images/{self.valeur}_{self.symbole.lower()}.png"
+
     def __str__(self) -> str:
         symboles_dict = {"Trefle": "♧", "Pique": "♤", "Coeur": "🤍", "Carreau": "♢"}
         

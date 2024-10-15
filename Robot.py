@@ -1,7 +1,5 @@
 import random
-from affichage import *
-
-class Joueur:
+class Robot:
     def __init__(self, nom) -> None:
         self.nom = nom
         self.main = []
@@ -26,12 +24,8 @@ class Joueur:
         return (seuil_annonce + 10, atout)
     
     def choisir_carte_a_poser(self, cartes_posables):
-        # TODO vérifier qu'on ait le droit de poser
-        carte = afficher_main(self.main)
-        
-        for i in range(len(self.main)):
-            if self.main[i] == carte:
-                return self.poser(i)
+        # TODO heuristique ou train IA sur la carte à poser
+        return self.poser(cartes_posables[random.randrange(len(cartes_posables))])
 
     def poser(self, indice):
         print(f"{self.nom} pose {self.main[indice]}")
