@@ -7,6 +7,9 @@ class Joueur:
     def donner_carte(self, carte):
         self.main.append(carte)
     
+    def vider_main(self):
+        self.main = []
+
     def montrer_main(self):
         print(f"Main de {self.nom}:", end=' ')
         for carte in self.main:
@@ -14,10 +17,11 @@ class Joueur:
         print("")
     
     def annoncer(self, seuil_annonce):
-        if seuil_annonce > 70 and random.random() > 0.2:
-            return None     
+        if random.random() > 0.2:
+            return None
         # None pour pas d'annonce, sinon, on renvoie l'annonce qu'on veut faire
-        return (80, "Pique")
+        atout = ["Pique", "Trèfle", "Coeur", "Carreau"][random.randrange(4)]
+        return (seuil_annonce + 10, atout)
     
     def choisir_carte_a_poser(self, cartes_posables):
         # TODO heuristique ou train IA sur la carte à poser
@@ -44,23 +48,23 @@ class Joueur:
         return hauteur
 
     def est_maitre(self, cartes_posees, atout):
-        if len(cartes_posees) > 1:
-            print(f"Cartes posées: ", end="")
-            for carte in cartes_posees:
-                print(carte, end=" ")
-            print("")
-            if len(cartes_posees) == 3:
-                return cartes_posees[-2].gt(cartes_posees[-1], atout) and cartes_posees[-2].gt(cartes_posees[-3], atout)
-            return cartes_posees[-2].gt(cartes_posees[-1], atout)
+        nb_cartes_posees = sum(1 for item in cartes_posees if item is not None)
+        if nb_cartes_posees > 1:
+            carte1 = next(item for item in cartes_posees if item is not None)
+            carte2 = next(item for i, item in enumerate(cartes_posees) if item is not None and sum(1 for x in cartes_posees[:i+1] if x is not None) == 2)
+            if nb_cartes_posees == 3:
+                carte3 = next(item for i, item in enumerate(cartes_posees) if item is not None and sum(1 for x in cartes_posees[:i+1] if x is not None) == 3)
+                return carte2.gt(carte1, atout) and carte2.gt(carte3, atout)
+            return carte1.gt(carte2, atout)
         return False
 
     def jouer(self, cartes_posees, atout):
         print(f"{self.nom} joue, voici sa main:", end = ' ')
         self.montrer_main()
-        if cartes_posees == []:
+        if cartes_posees == [None]*4:
             return self.poser(0) # ICI CHANGER 0 PAR LID DE LA MEILLEURE CARTE A JOUER
         else:
-            symbole_demande = cartes_posees[0].symbole # Symbole qui a été demandé
+            symbole_demande = next(item for item in cartes_posees if item is not None).symbole # Symbole qui a été demandé
             # Si on a des cartes demandées, on doit jouer une de ces cartes
             cartes_symbole_demande = []
             for i_carte in range(len(self.main)):
@@ -84,8 +88,3 @@ class Joueur:
                 carte = self.main[i_carte]
                 cartes_jouables.append(i_carte)
             return self.choisir_carte_a_poser(cartes_jouables)
-             
-            
-                
-
-

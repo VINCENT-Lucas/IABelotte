@@ -19,3 +19,16 @@ class Carte:
         else:
             values_dic = {"7": 7, "8": 8, "9": 9, "J": 10, "Q": 11, "K": 12, "10": 13, "A": 14}
         return values_dic[self.valeur] > values_dic[other.valeur]
+
+    def afficher_liste(liste_cartes):
+        for carte in liste_cartes:
+            print(carte, end=" ")
+        print("")
+    
+    def points(self, atout):
+        if self.symbole == atout:
+            values_dic = {"7": 0, "8": 0, "Q": 3, "K": 4, "10": 10, "A": 11, "9": 14, "J": 20}
+        else:
+            values_dic = {"7": 0, "8": 0, "9": 0, "J": 2, "Q": 3, "K": 4, "10": 10, "A": 11}
+        return values_dic[self.valeur]
+ 
