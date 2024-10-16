@@ -104,13 +104,17 @@ class Partie:
         print("\nDébut de la phase de jeu !")
         valeur_annonce, atout = annonce
         scores_manche = [0, 0]
-        for _ in range(8):
+        for i_manche in range(8):
             # Il faudrait stocker les cartes jouées dans une liste de taille 4 avec l'indice correspondant au joueur
             cartes_posees = self.pli(indice_joueur, atout)
             joueur_gagnant = self.determiner_gagnant_pli(cartes_posees, atout)
             # Maintenant qu'on a le pli, il faut l'associer à l'équipe qui le gagne
             score_pli = self.compter_points(cartes_posees, atout)
             scores_manche[joueur_gagnant%2] += score_pli
+            # 10 de der
+            if i_manche == 7:
+                print(f"L'équipe {joueur_gagnant%2} prend les 10 de der !")
+                scores_manche[joueur_gagnant%2] += 10
             indice_joueur = joueur_gagnant
             print(f"Fin du pli ! Scores du pli: {score_pli} pour l'équipe {joueur_gagnant%2}.")
         # En suite, on compte tous les points qu'on a fait pour les 2 équipes
@@ -123,11 +127,38 @@ class Partie:
         # Phase d'annonce, si on renvoie None c'est que personne n'a annoncé
         annonce, indice_annonceur = self.phase_annonce(indice_joueur)
         if annonce is None:
-            return (0, 0)
+            return None, None, None
 
         # Phase de jeu
         points = self.phase_jeu(annonce, indice_joueur)
-        return points
+        return points, indice_annonceur, annonce
+
+    def arrondir_points(self, liste_pts):
+        # liste_pts une liste contenant les points des 2 équipes
+        pts1, pts2 = liste_pts[0], liste_pts[1]
+        pts1 /= 10
+        pts2 /= 10
+        pts1 = round(pts1+0.01)
+        pts2 = round(pts2+0.01)
+        pts1 *= 10
+        pts2 *= 10
+        return [pts1, pts2]
+
+    def fin_partie(self, points_manche, indice_annonceur, annonce):
+        points_arrondis = self.arrondir_points(points_manche)
+        print(f"L'équipe {indice_annonceur%2} avait annoncé {annonce}. Scores: {points_manche}")
+        # On update les scores
+        if points_arrondis[indice_annonceur%2] >= annonce[0]:
+            # Si on fait le contrat
+            print("Le contrat est fait !")
+            self.scores[indice_annonceur%2] += (annonce[0] + points_arrondis[indice_annonceur%2])
+            self.scores[(indice_annonceur+1)%2] += points_arrondis[(indice_annonceur+1)%2]
+        else:
+            # Si on fait pas le contrat
+            print("Le contrat est perdu !")
+            self.scores[(indice_annonceur+1)%2] += (160 + annonce[0])
+        
+        return 
 
     def partie(self):
         # On joue jusqu'à ce qu'on atteigne 1010
@@ -140,11 +171,13 @@ class Partie:
             self.afficher_mains()
             print(f"\nDebut de la manche {i_manche}\n")
             # On joue une manche
-            points_manche = self.manche()
+            points_manche, indice_annonceur, annonce = self.manche()
+            if points_manche is not None:
+                # On gère la fin de partie (calcul des scores)
+                self.fin_partie(points_manche, indice_annonceur, annonce)
             # On passe au donneur suivant
             self.id_donneur = 0 if self.id_donneur + 1 == len(self.liste_joueurs) else self.id_donneur + 1
-            # On update les scores
-            self.scores = [self.scores[0] + points_manche[0], self.scores[1] + points_manche[1]]
+            
             print(f"----Points sur cette manche: {points_manche}")
             print(f"Scores: {self.scores[0]} à {self.scores[1]}")
             i_manche += 1
