@@ -38,7 +38,7 @@ class Partie:
         # indice_joueur désigne l'indice dans la liste des joueurs du joueur qui commence
         cartes_posees = [None]*4
         for _ in range(4):
-            carte = self.liste_joueurs[indice_joueur].jouer(cartes_posees, atout)
+            carte = self.liste_joueurs[indice_joueur].jouer(cartes_posees, atout, self.scores)
             cartes_posees[indice_joueur] = carte
             indice_joueur = 0 if indice_joueur + 1 == len(self.liste_joueurs) else indice_joueur + 1
         Carte.afficher_liste(cartes_posees)

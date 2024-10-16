@@ -2,7 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from Partie import *
 
-carte_selectionnee = None
+carte_posee = None
 DIM_CARTE = (100, 150)
 
 def charger_image_dos_carte(dos_carte):
@@ -11,10 +11,28 @@ def charger_image_dos_carte(dos_carte):
     dos_image = dos_image.resize(DIM_CARTE)  # Redimensionner le dos de carte
     return ImageTk.PhotoImage(dos_image)
 
+def effacer_cartes_jouees(frame_centre):
+    # Nettoyer l'ancienne carte (s'il y en a une)
+    for widget in frame_centre.winfo_children():
+        widget.destroy()
+
+def afficher_carte_jouee(frame_centre, carte):
+    """Affiche une carte jouée au centre de l'écran."""
+    
+    # Charger l'image de la carte
+    image = Image.open(carte.get_image())
+    image = image.resize(DIM_CARTE)  # Redimensionner l'image de la carte
+    photo = ImageTk.PhotoImage(image)
+
+    # Afficher la carte au centre
+    label_carte = tk.Label(frame_centre, image=photo)
+    label_carte.image = photo  # Conserver une référence pour éviter la suppression de l'image
+    label_carte.pack(side='left')
+
 def carte_selectionnee(root, carte):
-    global carte_selectionnee
+    global carte_posee
     """Fonction appelée lorsque l'utilisateur clique sur une carte."""
-    carte_selectionnee = carte  # Remplacez par une action souhaitée
+    carte_posee = carte  # Remplacez par une action souhaitée
     root.destroy()
 
 def afficher_main_joueur(root, frame, main):
@@ -69,7 +87,7 @@ def afficher_cartes_ouest(root, dos_photo, nb_cartes):
     frame_ouest.pack(side="left", padx=10)
     afficher_cartes_retournees(frame_ouest, "Ouest", nb_cartes, dos_photo, decalage, orientation="vertical")
     
-def afficher_main(main_joueur):
+def afficher_main(main_joueur, cartes_jouees):
     """Affiche la disposition complète des cartes pour tous les joueurs."""
     root = tk.Tk()
     root.title("Coinche")
@@ -82,6 +100,17 @@ def afficher_main(main_joueur):
     frame_sud.pack(side="bottom", pady=10)
     afficher_main_joueur(root, frame_sud, main_joueur)
 
+    # --------- Frame centrale pour la carte jouée ---------
+    frame_centre = tk.Frame(root, width=100, height=150)
+    frame_centre.place(relx=0.5, rely=0.5, anchor="center") 
+    
+    for carte in cartes_jouees:
+        # Appel pour afficher une carte jouée (tu peux appeler cette fonction au moment où la carte est jouée)
+        if carte is not None:
+            pass
+            #afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
+
+
     nb_cartes = 6
     afficher_cartes_nord(root, dos_photo, nb_cartes)
     afficher_cartes_est(root, dos_photo, nb_cartes)
@@ -89,7 +118,7 @@ def afficher_main(main_joueur):
 
     # Lancer l'application
     root.mainloop()
-    return carte_selectionnee
+    return carte_posee
     
 
 partie = Partie()
@@ -106,4 +135,4 @@ paquet.melanger()
 partie.distribuer_cartes(paquet)
 # Exemple d'utilisation
 liste_de_cartes = j1.main # Liste de cartes à afficher
-c = afficher_main(liste_de_cartes)
+c = afficher_main(liste_de_cartes, [j2.main[0], j3.main[0]])

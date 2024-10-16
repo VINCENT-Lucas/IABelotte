@@ -25,10 +25,11 @@ class Joueur:
         atout = ["Pique", "Trèfle", "Coeur", "Carreau"][random.randrange(4)]
         return (seuil_annonce + 10, atout)
     
-    def choisir_carte_a_poser(self, cartes_posables):
+    def choisir_carte_a_poser(self, cartes_posables, cartes_posees, atout, score):
         # TODO vérifier qu'on ait le droit de poser
-        carte = afficher_main(self.main)
-        
+        print(f"CARTES POSEES: {cartes_posees}")
+        carte = afficher_jeu(self.main, cartes_posees, atout, score)
+        print(f"JE VEUX POSER {carte}")
         for i in range(len(self.main)):
             if self.main[i] == carte:
                 return self.poser(i)
@@ -64,7 +65,7 @@ class Joueur:
             return carte1.gt(carte2, atout)
         return False
 
-    def jouer(self, cartes_posees, atout):
+    def jouer(self, cartes_posees, atout, score):
         print(f"{self.nom} joue, voici sa main:", end = ' ')
         self.montrer_main()
         if cartes_posees == [None]*4:
@@ -78,7 +79,7 @@ class Joueur:
                 if carte.symbole == symbole_demande:
                     cartes_symbole_demande.append(i_carte)
             if cartes_symbole_demande != []:
-                return self.choisir_carte_a_poser(cartes_symbole_demande)
+                return self.choisir_carte_a_poser(cartes_symbole_demande, cartes_posees, atout, score)
             # Sinon, si on n'est pas maître, si on peut couper on doit couper
             if not self.est_maitre(cartes_posees, atout):
                 cartes_jouables = []
@@ -87,10 +88,10 @@ class Joueur:
                     if carte.symbole == atout:
                         cartes_jouables.append(i_carte)
                 if cartes_jouables != []:
-                    return self.choisir_carte_a_poser(cartes_jouables)
+                    return self.choisir_carte_a_poser(cartes_jouables, cartes_posees, atout, score)
             # Sinon, on joue ce qu'on veut
             cartes_jouables = []
             for i_carte in range(len(self.main)):
                 carte = self.main[i_carte]
                 cartes_jouables.append(i_carte)
-            return self.choisir_carte_a_poser(cartes_jouables)
+            return self.choisir_carte_a_poser(cartes_jouables, cartes_posees, atout, score)

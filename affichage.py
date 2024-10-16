@@ -2,7 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from Partie import *
 
-carte_jouee = None
+carte_posee = None
 DIM_CARTE = (100, 150)
 
 def charger_image_dos_carte(dos_carte):
@@ -11,10 +11,28 @@ def charger_image_dos_carte(dos_carte):
     dos_image = dos_image.resize(DIM_CARTE)  # Redimensionner le dos de carte
     return ImageTk.PhotoImage(dos_image)
 
+def effacer_cartes_jouees(frame_centre):
+    # Nettoyer l'ancienne carte (s'il y en a une)
+    for widget in frame_centre.winfo_children():
+        widget.destroy()
+
+def afficher_carte_jouee(frame_centre, carte):
+    """Affiche une carte jouée au centre de l'écran."""
+    
+    # Charger l'image de la carte
+    image = Image.open(carte.get_image())
+    image = image.resize(DIM_CARTE)  # Redimensionner l'image de la carte
+    photo = ImageTk.PhotoImage(image)
+
+    # Afficher la carte au centre
+    label_carte = tk.Label(frame_centre, image=photo)
+    label_carte.image = photo  # Conserver une référence pour éviter la suppression de l'image
+    label_carte.pack(side='left')
+
 def carte_selectionnee(root, carte):
-    global carte_jouee
+    global carte_posee
     """Fonction appelée lorsque l'utilisateur clique sur une carte."""
-    carte_jouee = carte  # Remplacez par une action souhaitée
+    carte_posee = carte  # Remplacez par une action souhaitée
     root.destroy()
 
 def afficher_main_joueur(root, frame, main):
@@ -38,7 +56,7 @@ def afficher_main_joueur(root, frame, main):
 
 def afficher_cartes_retournees(frame, position, nb_cartes, image_dos, decalage=0, orientation="horizontal"):
     """Affiche les cartes retournées (dos) pour un joueur."""
-    label_titre = tk.Label(frame, text=f"Cartes {position}", font=("Helvetica", 14))
+    label_titre = tk.Label(frame, text=f"Cartes du collègue", font=("Helvetica", 14))
     label_titre.pack()
     frame.update()
     for i in range(nb_cartes):
@@ -69,10 +87,27 @@ def afficher_cartes_ouest(root, dos_photo, nb_cartes):
     frame_ouest.pack(side="left", padx=10)
     afficher_cartes_retournees(frame_ouest, "Ouest", nb_cartes, dos_photo, decalage, orientation="vertical")
     
-def afficher_main(main_joueur):
+def afficher_jeu(main_joueur, cartes_jouees, atout, score):
     """Affiche la disposition complète des cartes pour tous les joueurs."""
     root = tk.Tk()
     root.title("Coinche")
+    largeur_fenetre = 800
+    hauteur_fenetre = 680
+    root.geometry(f"{largeur_fenetre}x{hauteur_fenetre}")
+
+    # Créer une frame pour l'atout et le score
+    frame_info = tk.Frame(root)
+    frame_info.pack(side="top", fill="x")
+
+    # Label pour afficher l'atout
+    symboles_dict = {"Trèfle": "♧", "Pique": "♤", "Coeur": "🤍", "Carreau": "♢"}
+    label_atout = tk.Label(frame_info, text=f"Atout: {symboles_dict[atout]}", font=("Helvetica", 14))
+    label_atout.pack(side="left", padx=10)  # Aligné à gauche
+
+    # Label pour afficher le score
+    label_score = tk.Label(frame_info, text=f"{score[0]} - {score[1]}", font=("Helvetica", 14))
+    label_score.pack(side="right", padx=10)  # Aligné à droite
+
 
     # Charger l'image du dos de carte
     dos_photo = charger_image_dos_carte("images/Dos.png")
@@ -82,6 +117,16 @@ def afficher_main(main_joueur):
     frame_sud.pack(side="bottom", pady=10)
     afficher_main_joueur(root, frame_sud, main_joueur)
 
+    # --------- Frame centrale pour la carte jouée ---------
+    frame_centre = tk.Frame(root, width=4*(DIM_CARTE[0]+10), height=DIM_CARTE[1])
+    frame_centre.place(relx=0.5, rely=0.5, anchor="center") 
+    
+    for carte in cartes_jouees:
+        # Appel pour afficher une carte jouée (tu peux appeler cette fonction au moment où la carte est jouée)
+        if carte is not None:
+            afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
+
+
     nb_cartes = len(main_joueur)
     afficher_cartes_nord(root, dos_photo, nb_cartes)
     afficher_cartes_est(root, dos_photo, nb_cartes)
@@ -89,5 +134,4 @@ def afficher_main(main_joueur):
 
     # Lancer l'application
     root.mainloop()
-    return carte_jouee
-    
+    return carte_posee

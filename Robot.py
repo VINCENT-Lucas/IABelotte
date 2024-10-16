@@ -1,9 +1,10 @@
 import random
+
 class Robot:
     def __init__(self, nom) -> None:
         self.nom = nom
         self.main = []
-    
+        
     def donner_carte(self, carte):
         self.main.append(carte) 
     
@@ -58,7 +59,7 @@ class Robot:
             return carte1.gt(carte2, atout)
         return False
 
-    def jouer(self, cartes_posees, atout):
+    def jouer(self, cartes_posees, atout, score):
         print(f"{self.nom} joue, voici sa main:", end = ' ')
         self.montrer_main()
         if cartes_posees == [None]*4:
