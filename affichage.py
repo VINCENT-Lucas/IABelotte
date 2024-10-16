@@ -91,7 +91,7 @@ def afficher_jeu(main_joueur, cartes_jouees, atout, score):
     """Affiche la disposition complète des cartes pour tous les joueurs."""
     root = tk.Tk()
     root.title("Coinche")
-    largeur_fenetre = 800
+    largeur_fenetre = 900
     hauteur_fenetre = 680
     root.geometry(f"{largeur_fenetre}x{hauteur_fenetre}")
 
@@ -126,11 +126,16 @@ def afficher_jeu(main_joueur, cartes_jouees, atout, score):
         if carte is not None:
             afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
 
+    nb_cartes_jouees = sum(1 for item in cartes_jouees if item is not None)
 
-    nb_cartes = len(main_joueur)
-    afficher_cartes_nord(root, dos_photo, nb_cartes)
-    afficher_cartes_est(root, dos_photo, nb_cartes)
-    afficher_cartes_ouest(root, dos_photo, nb_cartes)
+    nb_cartes_nord = len(main_joueur) - int(nb_cartes_jouees>=2)
+    afficher_cartes_nord(root, dos_photo, nb_cartes_nord)
+
+    nb_cartes_est = len(main_joueur) - int(nb_cartes_jouees>=1)
+    afficher_cartes_est(root, dos_photo, nb_cartes_est)
+    
+    nb_cartes_ouest = len(main_joueur) - int(nb_cartes_jouees>=3)
+    afficher_cartes_ouest(root, dos_photo, nb_cartes_ouest)
 
     # Lancer l'application
     root.mainloop()

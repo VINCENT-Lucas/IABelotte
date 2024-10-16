@@ -56,7 +56,7 @@ def afficher_main_joueur(root, frame, main):
 
 def afficher_cartes_retournees(frame, position, nb_cartes, image_dos, decalage=0, orientation="horizontal"):
     """Affiche les cartes retournées (dos) pour un joueur."""
-    label_titre = tk.Label(frame, text=f"Cartes {position}", font=("Helvetica", 14))
+    label_titre = tk.Label(frame, text=f"Cartes du collègue", font=("Helvetica", 14))
     label_titre.pack()
     frame.update()
     for i in range(nb_cartes):
@@ -87,10 +87,27 @@ def afficher_cartes_ouest(root, dos_photo, nb_cartes):
     frame_ouest.pack(side="left", padx=10)
     afficher_cartes_retournees(frame_ouest, "Ouest", nb_cartes, dos_photo, decalage, orientation="vertical")
     
-def afficher_main(main_joueur, cartes_jouees):
+def afficher_jeu(main_joueur, cartes_jouees, atout, score):
     """Affiche la disposition complète des cartes pour tous les joueurs."""
     root = tk.Tk()
     root.title("Coinche")
+    largeur_fenetre = 800
+    hauteur_fenetre = 680
+    root.geometry(f"{largeur_fenetre}x{hauteur_fenetre}")
+
+    # Créer une frame pour l'atout et le score
+    frame_info = tk.Frame(root)
+    frame_info.pack(side="top", fill="x")
+
+    # Label pour afficher l'atout
+    symboles_dict = {"Trèfle": "♧", "Pique": "♤", "Coeur": "🤍", "Carreau": "♢"}
+    label_atout = tk.Label(frame_info, text=f"Atout: {symboles_dict[atout]}", font=("Helvetica", 14))
+    label_atout.pack(side="left", padx=10)  # Aligné à gauche
+
+    # Label pour afficher le score
+    label_score = tk.Label(frame_info, text=f"{score[0]} - {score[1]}", font=("Helvetica", 14))
+    label_score.pack(side="right", padx=10)  # Aligné à droite
+
 
     # Charger l'image du dos de carte
     dos_photo = charger_image_dos_carte("images/Dos.png")
@@ -101,17 +118,16 @@ def afficher_main(main_joueur, cartes_jouees):
     afficher_main_joueur(root, frame_sud, main_joueur)
 
     # --------- Frame centrale pour la carte jouée ---------
-    frame_centre = tk.Frame(root, width=100, height=150)
+    frame_centre = tk.Frame(root, width=4*(DIM_CARTE[0]+10), height=DIM_CARTE[1])
     frame_centre.place(relx=0.5, rely=0.5, anchor="center") 
     
     for carte in cartes_jouees:
         # Appel pour afficher une carte jouée (tu peux appeler cette fonction au moment où la carte est jouée)
         if carte is not None:
-            pass
-            #afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
+            afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
 
 
-    nb_cartes = 6
+    nb_cartes = len(main_joueur)
     afficher_cartes_nord(root, dos_photo, nb_cartes)
     afficher_cartes_est(root, dos_photo, nb_cartes)
     afficher_cartes_ouest(root, dos_photo, nb_cartes)
@@ -119,7 +135,7 @@ def afficher_main(main_joueur, cartes_jouees):
     # Lancer l'application
     root.mainloop()
     return carte_posee
-    
+
 
 partie = Partie()
 
@@ -135,4 +151,4 @@ paquet.melanger()
 partie.distribuer_cartes(paquet)
 # Exemple d'utilisation
 liste_de_cartes = j1.main # Liste de cartes à afficher
-c = afficher_main(liste_de_cartes, [j2.main[0], j3.main[0]])
+c = afficher_jeu(liste_de_cartes, [j2.main[0], j3.main[0]], "Trèfle", [0, 0])

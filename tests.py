@@ -1,18 +1,18 @@
-# TODO GERER LES INDICES ---> OK
-# Penser a mélanger le paquet fin partie ------> OK
+# DONE GERER LES INDICES
+# DONE Penser a mélanger le paquet fin partie
 # TODO Gérer les coupes au lieu de mélanger au pif 
 
 # ------------ Partie jeu -----------------------
 
-# TODO gérer lorsque personne n'annonce direct -> A moitié bon
-# TODO gérer les 10 de der ------------------> FAIT
-# TODO regarder si on a réussi le contrat --------------> FAIT
+# DONE gérer lorsque personne n'annonce direct
+# DONE gérer les 10 de der 
+# DONE regarder si on a réussi le contrat 
 
 # TODO ajouter le fait de coincher 
 
 # TODO SURTOUT jouer seulement les cartes qu'on peut
 # --- Soit on rejoue si la carte est incorrecte mais le mieux c'est de créer des boutons que pour les cartes correctes
-# TODO régler le problème du joueur qui joue tout seul des fois
+# DONE régler le problème du joueur qui joue tout seul des fois
 
 # ------------ Partie affichage -----------------------
 
@@ -21,6 +21,10 @@
 
 # TODO faire des "animations" pour faire jouer les autres joueurs
 # --- Donc il faut qu'à chaque 
+
+# DONE Retirer les cartes en fonction de ceux qui ont joué
+
+# TODO Afficher les choix lors des annonces
 
 # ------------- Partie IA ------------------------
 

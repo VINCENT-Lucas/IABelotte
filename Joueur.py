@@ -69,7 +69,7 @@ class Joueur:
         print(f"{self.nom} joue, voici sa main:", end = ' ')
         self.montrer_main()
         if cartes_posees == [None]*4:
-            return self.poser(0) # ICI CHANGER 0 PAR LID DE LA MEILLEURE CARTE A JOUER
+            return self.choisir_carte_a_poser(self.main, cartes_posees, atout, score)
         else:
             symbole_demande = next(item for item in cartes_posees if item is not None).symbole # Symbole qui a été demandé
             # Si on a des cartes demandées, on doit jouer une de ces cartes
