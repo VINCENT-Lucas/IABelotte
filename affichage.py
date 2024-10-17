@@ -3,18 +3,16 @@ from PIL import Image, ImageTk
 from Partie import *
 
 carte_posee = None
+annonce_selectionnee = None
+symbole_selectionne = None
 DIM_CARTE = (100, 150)
+DIM_FENETRE = (900, 680)
 
 def charger_image_dos_carte(dos_carte):
     """Charge et redimensionne l'image du dos de carte."""
     dos_image = Image.open(dos_carte)
     dos_image = dos_image.resize(DIM_CARTE)  # Redimensionner le dos de carte
     return ImageTk.PhotoImage(dos_image)
-
-def effacer_cartes_jouees(frame_centre):
-    # Nettoyer l'ancienne carte (s'il y en a une)
-    for widget in frame_centre.winfo_children():
-        widget.destroy()
 
 def afficher_carte_jouee(frame_centre, carte):
     """Affiche une carte jouée au centre de l'écran."""
@@ -91,8 +89,7 @@ def afficher_cartes_ouest(root, dos_photo, nb_cartes):
 def creer_fenetre():
     root = tk.Tk()
     root.title("Coinche")
-    largeur_fenetre = 900
-    hauteur_fenetre = 680
+    largeur_fenetre, hauteur_fenetre = DIM_FENETRE
     root.geometry(f"{largeur_fenetre}x{hauteur_fenetre}")
     return root
 
@@ -151,3 +148,104 @@ def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
     # Lancer l'application
     root.mainloop()
     return carte_posee
+
+def selectionner_annonce(value):
+    global annonce_selectionnee
+    annonce_selectionnee = int(value)
+
+def selectionner_symbole(symbole):
+    global symbole_selectionne
+    symbole_selectionne = symbole
+
+def passer_annonce(root):
+    global annonce_selectionnee, symbole_selectionne
+    annonce_selectionnee, symbole_selectionne = None, None
+    root.destroy()
+
+def valider_annonce(root):
+    root.destroy()
+
+    # --- Fonction d'affichage de la sélection d'annonces ---
+
+def afficher_selection_annonce(root, seuil_annonces):
+    if seuil_annonces < 80:
+        seuil_annonces = 80
+    global annonce_selectionnee, symbole_selectionne
+
+    # Créer une frame pour l'annonce
+    frame_annonce = tk.Frame(root)
+    frame_annonce.place(relx=0.5, rely=0.5, anchor="center") 
+
+    # Label principal
+    label_annonce = tk.Label(frame_annonce, text="Choisissez votre annonce :", font=("Helvetica", 14))
+    label_annonce.pack()
+
+    # Label dynamique qui montre l'annonce actuelle
+    label_affichage = tk.Label(frame_annonce, text="", font=("Helvetica", 12))
+    label_affichage.pack()
+
+    # Échelle pour choisir l'annonce (80 à 160)
+    scale_annonce = tk.Scale(frame_annonce, from_=seuil_annonces, to=160, orient="horizontal", resolution=10, length=200)
+    scale_annonce.pack(pady=10)
+    scale_annonce.set(seuil_annonces)
+
+    def mettre_a_jour_label():
+        annonce = scale_annonce.get()
+        selectionner_annonce(annonce)
+        atout = symbole_selectionne if symbole_selectionne else ""
+        label_affichage.config(text=f"Annonce actuelle : {annonce}{atout}")
+
+    scale_annonce.bind("<Motion>", lambda event: mettre_a_jour_label())
+
+    # Frame pour les boutons des symboles
+    frame_boutons = tk.Frame(frame_annonce)
+    frame_boutons.pack(pady=10)
+    creer_boutons_symboles(frame_boutons, mettre_a_jour_label)
+
+    # Frame pour les boutons de validation
+    frame_boutons_validation = tk.Frame(frame_annonce)
+    frame_boutons_validation.pack(pady=10)
+    creer_boutons_validation(frame_boutons_validation, root)
+
+def creer_boutons_symboles(frame, callback_update_label):
+    boutons_symboles = [("Pique", "♠"), ("Cœur", "♥"), ("Carreau", "♦"), ("Trèfle", "♣")]
+    for _, symbole in boutons_symboles:
+        bouton = tk.Button(frame, text=symbole, font=("Helvetica", 14),
+                           command=lambda s=symbole: [selectionner_symbole(s), callback_update_label()])
+        bouton.pack(side="left", padx=10)
+
+def creer_boutons_validation(frame, root):
+    bouton_passer = tk.Button(frame, text="Passer", command=lambda: passer_annonce(root), bg="red", fg="white", font=("Helvetica", 12))
+    bouton_valider = tk.Button(frame, text="Valider", command=lambda: valider_annonce(root), bg="green", fg="white", font=("Helvetica", 12))
+    bouton_passer.pack(side="left", padx=10)
+    bouton_valider.pack(side="left", padx=10)
+
+# --- Fonction principale d'affichage des annonces ---
+
+def afficher_annonces(main_joueur, seuil_annonces):
+    cartes_posables = []
+    """Affiche la disposition complète des cartes pour tous les joueurs."""
+    root = creer_fenetre()
+
+    # Créer une frame d'informations (ex : score, atout) - à définir selon vos besoins
+    frame_info = tk.Frame(root)
+    frame_info.pack(side="top", pady=10)
+
+    # Charger l'image du dos de carte
+    dos_photo = charger_image_dos_carte("images/Dos.png")
+
+    # --------- Afficher l'interface d'annonce ---------
+    afficher_selection_annonce(root, seuil_annonces)
+
+    # --------- Cartes du joueur (Sud) ---------
+    frame_sud = tk.Frame(root)
+    frame_sud.pack(side="bottom", pady=10)
+    afficher_main_joueur(root, frame_sud, main_joueur, cartes_posables)
+
+    afficher_cartes_nord(root, dos_photo, 8)
+    afficher_cartes_est(root, dos_photo, 8)
+    afficher_cartes_ouest(root, dos_photo, 8)
+
+    # Lancer l'application
+    root.mainloop()
+    return annonce_selectionnee, symbole_selectionne

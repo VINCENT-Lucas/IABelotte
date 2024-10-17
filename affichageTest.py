@@ -2,153 +2,120 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from Partie import *
 
-carte_posee = None
 DIM_CARTE = (100, 150)
+DIM_FENETRE = (900, 680)
 
-def charger_image_dos_carte(dos_carte):
-    """Charge et redimensionne l'image du dos de carte."""
-    dos_image = Image.open(dos_carte)
-    dos_image = dos_image.resize(DIM_CARTE)  # Redimensionner le dos de carte
-    return ImageTk.PhotoImage(dos_image)
+# Variables globales pour stocker l'annonce et le symbole sélectionné
+annonce_selectionnee = None
+symbole_selectionne = None
 
-def effacer_cartes_jouees(frame_centre):
-    # Nettoyer l'ancienne carte (s'il y en a une)
-    for widget in frame_centre.winfo_children():
-        widget.destroy()
+# --- FONCTIONS DE SÉLECTION ---
 
-def afficher_carte_jouee(frame_centre, carte):
-    """Affiche une carte jouée au centre de l'écran."""
-    
-    # Charger l'image de la carte
-    image = Image.open(carte.get_image())
-    image = image.resize(DIM_CARTE)  # Redimensionner l'image de la carte
-    photo = ImageTk.PhotoImage(image)
+def selectionner_annonce(value):
+    """Met à jour la variable globale pour l'annonce sélectionnée."""
+    global annonce_selectionnee
+    annonce_selectionnee = int(value)
 
-    # Afficher la carte au centre
-    label_carte = tk.Label(frame_centre, image=photo)
-    label_carte.image = photo  # Conserver une référence pour éviter la suppression de l'image
-    label_carte.pack(side='left')
+def selectionner_symbole(symbole):
+    """Met à jour la variable globale pour le symbole sélectionné."""
+    global symbole_selectionne
+    symbole_selectionne = symbole
 
-def carte_selectionnee(root, carte):
-    global carte_posee
-    """Fonction appelée lorsque l'utilisateur clique sur une carte."""
-    carte_posee = carte  # Remplacez par une action souhaitée
+# --- FONCTIONS POUR LES BOUTONS ---
+
+def creer_boutons_symboles(frame, callback_update_label):
+    """Crée les boutons pour choisir les symboles dans un frame."""
+    boutons_symboles = [("Pique", "♠"), ("Cœur", "♥"), ("Carreau", "♦"), ("Trèfle", "♣")]
+    for _, symbole in boutons_symboles:
+        bouton = tk.Button(frame, text=symbole, font=("Helvetica", 14),
+                           command=lambda s=symbole: [selectionner_symbole(s), callback_update_label()])
+        bouton.pack(side="left", padx=10)
+
+def creer_boutons_validation(frame, root):
+    """Crée les boutons 'Passer' et 'Valider' côte à côte."""
+    bouton_passer = tk.Button(frame, text="Passer", command=lambda: passer_annonce(root), bg="red", fg="white", font=("Helvetica", 12))
+    bouton_valider = tk.Button(frame, text="Valider", command=lambda: valider_annonce(root), bg="green", fg="white", font=("Helvetica", 12))
+    bouton_passer.pack(side="left", padx=10)
+    bouton_valider.pack(side="left", padx=10)
+
+# --- FONCTIONS POUR L'AFFICHAGE ---
+
+def mettre_a_jour_label(label, scale):
+    """Met à jour le label avec l'annonce et le symbole sélectionnés."""
+    def update():
+        annonce = scale.get()
+        selectionner_annonce(annonce)
+        atout = symbole_selectionne if symbole_selectionne else ""
+        label.config(text=f"Annonce actuelle : {annonce}{atout}")
+    return update
+
+# --- FONCTIONS DE GESTION DE L'ANNONCE ---
+
+def passer_annonce(root):
+    """Annule l'annonce en réinitialisant les variables et ferme la fenêtre."""
+    global annonce_selectionnee, symbole_selectionne
+    annonce_selectionnee, symbole_selectionne = None, None
     root.destroy()
 
-def afficher_main_joueur(root, frame, main):
-    """Affiche les cartes de la main du joueur (Sud)."""
-    label_titre = tk.Label(frame, text="Voici ta main:", font=("Helvetica", 16))
-    label_titre.pack(pady=10)
+def valider_annonce(root):
+    """Valide l'annonce et ferme la fenêtre."""
+    root.destroy()
 
-    for carte in main:
-        image = Image.open(carte.get_image())
-        image = image.resize(DIM_CARTE)  # Redimensionner l'image
-        photo = ImageTk.PhotoImage(image)
+# --- FONCTION D'AFFICHAGE DE LA FENÊTRE D'ANNONCE ---
 
-        # Créer un label avec l'image de la carte
-        label_carte = tk.Label(frame, image=photo)
-        label_carte.image = photo  # Conserver une référence à l'image pour éviter sa suppression
-        
-        # Ajouter un gestionnaire d'événements pour le clic sur la carte
-        label_carte.bind("<Button-1>", lambda event, c=carte: carte_selectionnee(root, c))
-        
-        label_carte.pack(side="left", padx=5)
+def afficher_selection_annonce(root):
+    """Affiche la fenêtre de sélection d'annonces avec mise à jour en temps réel."""
+    frame_annonce = tk.Frame(root)
+    frame_annonce.place(relx=0.5, rely=0.5, anchor="center") 
 
-def afficher_cartes_retournees(frame, position, nb_cartes, image_dos, decalage=0, orientation="horizontal"):
-    """Affiche les cartes retournées (dos) pour un joueur."""
-    label_titre = tk.Label(frame, text=f"Cartes du collègue", font=("Helvetica", 14))
-    label_titre.pack()
-    frame.update()
-    for i in range(nb_cartes):
-        label_dos = tk.Label(frame, image=image_dos)
-        label_dos.image = image_dos  # Conserver une référence à l'image
+    # Label principal
+    label_annonce = tk.Label(frame_annonce, text="Choisissez votre annonce :", font=("Helvetica", 14))
+    label_annonce.pack()
 
-        if orientation == "horizontal":
-            label_dos.pack(side="left", padx=5)
-        elif orientation == "vertical":
-            label_dos.place(x=0, y=i * decalage)  # Superposition avec décalage vertical
+    # Label dynamique qui montre l'annonce actuelle
+    label_affichage = tk.Label(frame_annonce, text="", font=("Helvetica", 12))
+    label_affichage.pack()
 
-def afficher_cartes_nord(root, dos_photo, nb_cartes):
-    frame_nord = tk.Frame(root)
-    frame_nord.pack(side="top")
-    afficher_cartes_retournees(frame_nord, "Nord", nb_cartes, dos_photo, orientation="horizontal")
+    # Échelle pour choisir l'annonce (80 à 160)
+    scale_annonce = tk.Scale(frame_annonce, from_=80, to=160, orient="horizontal", resolution=10, length=200)
+    scale_annonce.pack(pady=10)
+    scale_annonce.set(80)  # Valeur initiale
 
-def afficher_cartes_est(root, dos_photo, nb_cartes):
-    decalage = 10
-    frame_est = tk.Frame(root, width=DIM_CARTE[0], height=DIM_CARTE[1]+nb_cartes*decalage)
-    frame_est.pack_propagate(False)
-    frame_est.pack(side="right", padx=10)
-    afficher_cartes_retournees(frame_est, "Est", nb_cartes, dos_photo, decalage=decalage, orientation="vertical")
+    # Mettre à jour le label en fonction de la sélection sur le scale
+    update_label = mettre_a_jour_label(label_affichage, scale_annonce)
+    scale_annonce.bind("<Motion>", lambda event: update_label())
 
-def afficher_cartes_ouest(root, dos_photo, nb_cartes):
-    decalage = 10
-    frame_ouest = tk.Frame(root, width=DIM_CARTE[0], height=DIM_CARTE[1]+nb_cartes*decalage)
-    frame_ouest.pack_propagate(False)
-    frame_ouest.pack(side="left", padx=10)
-    afficher_cartes_retournees(frame_ouest, "Ouest", nb_cartes, dos_photo, decalage, orientation="vertical")
-    
-def afficher_jeu(main_joueur, cartes_jouees, atout, score):
-    """Affiche la disposition complète des cartes pour tous les joueurs."""
+    # Frame pour les boutons des symboles
+    frame_boutons = tk.Frame(frame_annonce)
+    frame_boutons.pack(pady=10)
+    creer_boutons_symboles(frame_boutons, update_label)  # Création des boutons de symbole
+
+    # Frame pour les boutons de validation
+    frame_boutons_validation = tk.Frame(frame_annonce)
+    frame_boutons_validation.pack(pady=10)
+    creer_boutons_validation(frame_boutons_validation, root)
+
+# --- FONCTION DE CRÉATION DE FENÊTRE ---
+
+def creer_fenetre():
+    """Crée la fenêtre principale avec les dimensions définies."""
     root = tk.Tk()
     root.title("Coinche")
-    largeur_fenetre = 800
-    hauteur_fenetre = 680
+    largeur_fenetre, hauteur_fenetre = DIM_FENETRE
     root.geometry(f"{largeur_fenetre}x{hauteur_fenetre}")
+    return root
 
-    # Créer une frame pour l'atout et le score
-    frame_info = tk.Frame(root)
-    frame_info.pack(side="top", fill="x")
-
-    # Label pour afficher l'atout
-    symboles_dict = {"Trèfle": "♧", "Pique": "♤", "Coeur": "🤍", "Carreau": "♢"}
-    label_atout = tk.Label(frame_info, text=f"Atout: {symboles_dict[atout]}", font=("Helvetica", 14))
-    label_atout.pack(side="left", padx=10)  # Aligné à gauche
-
-    # Label pour afficher le score
-    label_score = tk.Label(frame_info, text=f"{score[0]} - {score[1]}", font=("Helvetica", 14))
-    label_score.pack(side="right", padx=10)  # Aligné à droite
-
-
-    # Charger l'image du dos de carte
-    dos_photo = charger_image_dos_carte("images/Dos.png")
-
-    # --------- Cartes du joueur ---------
-    frame_sud = tk.Frame(root)
-    frame_sud.pack(side="bottom", pady=10)
-    afficher_main_joueur(root, frame_sud, main_joueur)
-
-    # --------- Frame centrale pour la carte jouée ---------
-    frame_centre = tk.Frame(root, width=4*(DIM_CARTE[0]+10), height=DIM_CARTE[1])
-    frame_centre.place(relx=0.5, rely=0.5, anchor="center") 
-    
-    for carte in cartes_jouees:
-        # Appel pour afficher une carte jouée (tu peux appeler cette fonction au moment où la carte est jouée)
-        if carte is not None:
-            afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
-
-
-    nb_cartes = len(main_joueur)
-    afficher_cartes_nord(root, dos_photo, nb_cartes)
-    afficher_cartes_est(root, dos_photo, nb_cartes)
-    afficher_cartes_ouest(root, dos_photo, nb_cartes)
-
-    # Lancer l'application
+def creer_fenetre_annonce():
+    """Crée la fenêtre pour la sélection des annonces et symboles."""
+    root = creer_fenetre()
+    afficher_selection_annonce(root)
     root.mainloop()
-    return carte_posee
+    return annonce_selectionnee, symbole_selectionne
 
-
-partie = Partie()
-
-j1 = Joueur("J1")
-j2 = Joueur("J2")
-j3 = Joueur("J3")
-j4 = Joueur("J4")
-
-liste_joueurs = [j1, j2, j3, j4]
-partie.ajouter_joueurs(liste_joueurs)
-paquet = Paquet()
-paquet.melanger()
-partie.distribuer_cartes(paquet)
 # Exemple d'utilisation
-liste_de_cartes = j1.main # Liste de cartes à afficher
-c = afficher_jeu(liste_de_cartes, [j2.main[0], j3.main[0]], "Trèfle", [0, 0])
+annonce, symbole = creer_fenetre_annonce()
+
+if annonce is None:
+    print("Le joueur a passé.")
+else:
+    print(f"Annonce sélectionnée: {annonce} points avec l'atout {symbole}")

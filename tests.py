@@ -26,6 +26,14 @@
 
 # TODO Afficher les choix lors des annonces   
 
+# TODO Si quelqu'un mise à 160 on fait passer tout le monde
+
+# TODO Afficher les dernières annonces de chaque joueur
+
+# TODO Afficher à quoi on joue
+
+# TODO Si quelqu'un quitte (et il renvoie une carte jouée None) lui faire jouer une carte au pif
+
 # ------------- Partie IA ------------------------
 
 '''
