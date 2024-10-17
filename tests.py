@@ -24,7 +24,7 @@
 
 # DONE Retirer les cartes en fonction de ceux qui ont joué
 
-# TODO Afficher les choix lors des annonces
+# TODO Afficher les choix lors des annonces   
 
 # ------------- Partie IA ------------------------
 
@@ -47,7 +47,7 @@ ANNONCES possibles: 80, 90, 100, 110, 120, 130, 140, 150, 160: 9 valeurs à 4 at
 
 Modèle qui joue
 - Cartes de la main
-- Cartes déjà tombées
+- Cartes déjà tombées -> 0 si pas deja tombée 1 sinon
 - Position du 1er à jouer (important dans certains cas)
 - Annonce et points actuels (si on est proche de mettre dedans l'équipe adverse, on peut donner beaucoup de points)
 

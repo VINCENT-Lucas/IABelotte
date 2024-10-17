@@ -35,7 +35,7 @@ def carte_selectionnee(root, carte):
     carte_posee = carte  # Remplacez par une action souhaitée
     root.destroy()
 
-def afficher_main_joueur(root, frame, main):
+def afficher_main_joueur(root, frame, main, cartes_posables):
     """Affiche les cartes de la main du joueur (Sud)."""
     label_titre = tk.Label(frame, text="Voici ta main:", font=("Helvetica", 16))
     label_titre.pack(pady=10)
@@ -50,7 +50,8 @@ def afficher_main_joueur(root, frame, main):
         label_carte.image = photo  # Conserver une référence à l'image pour éviter sa suppression
         
         # Ajouter un gestionnaire d'événements pour le clic sur la carte
-        label_carte.bind("<Button-1>", lambda event, c=carte: carte_selectionnee(root, c))
+        if carte in cartes_posables:
+            label_carte.bind("<Button-1>", lambda event, c=carte: carte_selectionnee(root, c))
         
         label_carte.pack(side="left", padx=5)
 
@@ -87,7 +88,7 @@ def afficher_cartes_ouest(root, dos_photo, nb_cartes):
     frame_ouest.pack(side="left", padx=10)
     afficher_cartes_retournees(frame_ouest, "Ouest", nb_cartes, dos_photo, decalage, orientation="vertical")
     
-def afficher_jeu(main_joueur, cartes_jouees, atout, score):
+def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
     """Affiche la disposition complète des cartes pour tous les joueurs."""
     root = tk.Tk()
     root.title("Coinche")
@@ -115,7 +116,7 @@ def afficher_jeu(main_joueur, cartes_jouees, atout, score):
     # --------- Cartes du joueur ---------
     frame_sud = tk.Frame(root)
     frame_sud.pack(side="bottom", pady=10)
-    afficher_main_joueur(root, frame_sud, main_joueur)
+    afficher_main_joueur(root, frame_sud, main_joueur, cartes_posables)
 
     # --------- Frame centrale pour la carte jouée ---------
     frame_centre = tk.Frame(root, width=4*(DIM_CARTE[0]+10), height=DIM_CARTE[1])
