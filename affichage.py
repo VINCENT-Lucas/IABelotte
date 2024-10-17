@@ -87,17 +87,18 @@ def afficher_cartes_ouest(root, dos_photo, nb_cartes):
     frame_ouest.pack_propagate(False)
     frame_ouest.pack(side="left", padx=10)
     afficher_cartes_retournees(frame_ouest, "Ouest", nb_cartes, dos_photo, decalage, orientation="vertical")
-    
-def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
-    """Affiche la disposition complète des cartes pour tous les joueurs."""
+
+def creer_fenetre():
     root = tk.Tk()
     root.title("Coinche")
     largeur_fenetre = 900
     hauteur_fenetre = 680
     root.geometry(f"{largeur_fenetre}x{hauteur_fenetre}")
+    return root
 
+def creer_frame_atout(fenetre, score, atout):
     # Créer une frame pour l'atout et le score
-    frame_info = tk.Frame(root)
+    frame_info = tk.Frame(fenetre)
     frame_info.pack(side="top", fill="x")
 
     # Label pour afficher l'atout
@@ -108,7 +109,23 @@ def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
     # Label pour afficher le score
     label_score = tk.Label(frame_info, text=f"{score[0]} - {score[1]}", font=("Helvetica", 14))
     label_score.pack(side="right", padx=10)  # Aligné à droite
+    return frame_info
 
+def afficher_cartes_jouees(root, cartes_jouees):
+    # --------- Frame centrale pour la carte jouée ---------
+    frame_centre = tk.Frame(root, width=4*(DIM_CARTE[0]+10), height=DIM_CARTE[1])
+    frame_centre.place(relx=0.5, rely=0.5, anchor="center") 
+    
+    for carte in cartes_jouees:
+        # Appel pour afficher une carte jouée
+        if carte is not None:
+            afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
+
+def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
+    """Affiche la disposition complète des cartes pour tous les joueurs."""
+    root = creer_fenetre()
+
+    frame_info = creer_frame_atout(root, score, atout)
 
     # Charger l'image du dos de carte
     dos_photo = charger_image_dos_carte("images/Dos.png")
@@ -118,14 +135,7 @@ def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
     frame_sud.pack(side="bottom", pady=10)
     afficher_main_joueur(root, frame_sud, main_joueur, cartes_posables)
 
-    # --------- Frame centrale pour la carte jouée ---------
-    frame_centre = tk.Frame(root, width=4*(DIM_CARTE[0]+10), height=DIM_CARTE[1])
-    frame_centre.place(relx=0.5, rely=0.5, anchor="center") 
-    
-    for carte in cartes_jouees:
-        # Appel pour afficher une carte jouée (tu peux appeler cette fonction au moment où la carte est jouée)
-        if carte is not None:
-            afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
+    afficher_cartes_jouees(root, cartes_jouees)
 
     nb_cartes_jouees = sum(1 for item in cartes_jouees if item is not None)
 

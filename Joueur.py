@@ -62,13 +62,26 @@ class Joueur:
             return carte1.gt(carte2, atout)
         return False
 
+    def symbole_demande(self, cartes_posees):
+        i_premier_None = next(i for i in range(len(cartes_posees)) if cartes_posees[i] is None)
+        i_premiere_carte = next(i for i in range(len(cartes_posees)) if cartes_posees[i] is not None)
+        if i_premiere_carte != 0:
+            i_symbole_demande = i_premiere_carte
+        else:
+            if cartes_posees[-1] == None:
+                i_symbole_demande = 0
+            else:
+                i_symbole_demande = i_premier_None + 1 if i_premier_None != len(cartes_posees)-1 else 0
+        return cartes_posees[i_symbole_demande].symbole
+
     def jouer(self, cartes_posees, atout, score):
         print(f"{self.nom} joue, voici sa main:", end = ' ')
         self.montrer_main()
         if cartes_posees == [None]*4:
             return self.choisir_carte_a_poser(self.main, cartes_posees, atout, score)
         else:
-            symbole_demande = next(item for item in cartes_posees if item is not None).symbole # Symbole qui a été demandé
+            symbole_demande = self.symbole_demande(cartes_posees) # Symbole qui a été demandé
+            print(f"SYMBOLE DEMANDE: {symbole_demande}")
             # Si on a des cartes demandées, on doit jouer une de ces cartes
             cartes_symbole_demande = []
             for i_carte in range(len(self.main)):
