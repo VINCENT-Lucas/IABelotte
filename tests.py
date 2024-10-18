@@ -10,7 +10,7 @@
 
 # TODO ajouter le fait de coincher 
 
-# TODO SURTOUT jouer seulement les cartes qu'on peut
+# DONE SURTOUT jouer seulement les cartes qu'on peut
 # --- Soit on rejoue si la carte est incorrecte mais le mieux c'est de créer des boutons que pour les cartes correctes
 # DONE régler le problème du joueur qui joue tout seul des fois
 

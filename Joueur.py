@@ -21,10 +21,10 @@ class Joueur:
     def annoncer(self, seuil_annonce):
         # TODO ajouter le seuil et le gérer
         annonce, symbole = afficher_annonces(self.main, seuil_annonce)
-        if annonce is None:
+        if annonce is None or symbole is None:
             return None
         conversion_symbole = {"♠": "Pique", "♣": "Trèfle", "♥":"Coeur", "♦":"Carreau"}
-        return (annonce + 10, conversion_symbole[symbole])
+        return (annonce, conversion_symbole[symbole])
     
     def choisir_carte_a_poser(self, cartes_posables, cartes_posees, atout, score):
         carte = afficher_jeu(self.main, cartes_posees, atout, score, cartes_posables)

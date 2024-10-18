@@ -168,8 +168,7 @@ def valider_annonce(root):
     # --- Fonction d'affichage de la sélection d'annonces ---
 
 def afficher_selection_annonce(root, seuil_annonces):
-    if seuil_annonces < 80:
-        seuil_annonces = 80
+
     global annonce_selectionnee, symbole_selectionne
 
     # Créer une frame pour l'annonce
@@ -185,9 +184,9 @@ def afficher_selection_annonce(root, seuil_annonces):
     label_affichage.pack()
 
     # Échelle pour choisir l'annonce (80 à 160)
-    scale_annonce = tk.Scale(frame_annonce, from_=seuil_annonces, to=160, orient="horizontal", resolution=10, length=200)
+    scale_annonce = tk.Scale(frame_annonce, from_=seuil_annonces+10, to=160, orient="horizontal", resolution=10, length=200)
     scale_annonce.pack(pady=10)
-    scale_annonce.set(seuil_annonces)
+    scale_annonce.set(seuil_annonces+10)
 
     def mettre_a_jour_label():
         annonce = scale_annonce.get()

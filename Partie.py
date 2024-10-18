@@ -50,9 +50,11 @@ class Partie:
         ''' Fonction qui gère un tour d'annonce: un tour d'annonce commence après le début de la phase d'annonce ou à la suite d'une
         annonce, et prend fin lorsque personne n'a décidé d'annoncer ou si quelqu'un a annoncé '''
         def tour_annonce(indice_actuel, seuil_annonce):
+            # TODO Range(4) si y'a pas eu d'annonce, 3 sinon
             print(f"Debut tour d'annonces avec un seuil à {seuil_annonce}")
             for _ in range(4):
                 annonce = self.liste_joueurs[indice_actuel].annoncer(seuil_annonce)
+                print(f"ANNONCE: {annonce}")
                 indice_actuel = indice_actuel + 1 if indice_actuel + 1 != len(self.liste_joueurs) else 0
                 # Si on a une nouvelle annonce
                 if annonce != None:
@@ -67,7 +69,6 @@ class Partie:
         while not annonces_terminees:
             # On met le seuil d'annonces à 70, on doit annoncer au moins 80
             annonce_provisoire, indice_joueur = tour_annonce(indice_joueur, seuil_annonce)
-            
             if annonce_provisoire is not None:
                 annonce = annonce_provisoire
                 seuil_annonce = annonce[0]
@@ -78,6 +79,8 @@ class Partie:
             else:
                 indice_preneur = indice_joueur
                 indice_joueur = indice_joueur + 1 if indice_joueur + 1 != len(self.liste_joueurs) else 0
+                if seuil_annonce == 160:
+                    annonces_terminees = True
         if annonce:
             print(f"On joue pour {annonce[0]} à {annonce[1]}")
         return annonce, indice_preneur
