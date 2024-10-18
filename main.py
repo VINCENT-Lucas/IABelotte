@@ -14,6 +14,7 @@ robotJ3 = Robot("J3")
 robotJ4 = Robot("J4")
 
 liste_joueurs = [j1, j2, j3, j4]
-partie.ajouter_joueurs(liste_joueurs)
+liste_joueurs_robots = [j1, robotJ2, robotJ3, robotJ4]
+partie.ajouter_joueurs(liste_joueurs_robots)
 
 partie.partie()

@@ -1,4 +1,5 @@
 import random
+from affichage import *
 
 class Robot:
     def __init__(self, nom) -> None:
@@ -24,12 +25,14 @@ class Robot:
         atout = ["Pique", "Trèfle", "Coeur", "Carreau"][random.randrange(4)]
         return (seuil_annonce + 10, atout)
     
-    def choisir_carte_a_poser(self, cartes_posables):
+    def choisir_carte_a_poser(self, cartes_posables, cartes_posees, atout, score):
         # TODO heuristique ou train IA sur la carte à poser
-        return self.poser(cartes_posables[random.randrange(len(cartes_posables))])
+        return self.poser(cartes_posables[random.randrange(len(cartes_posables))], cartes_posees, atout, score)
 
-    def poser(self, indice):
+    def poser(self, indice, cartes_posees, atout, score):
         print(f"{self.nom} pose {self.main[indice]}")
+        carte_posee = self.main[indice]
+        afficher_poser_carte(self.main, cartes_posees, atout, score, carte_posee, origine=3)
         return self.main.pop(indice)
     
     def cartes_jouables(self, jouer_a, atout, maitre):
@@ -63,7 +66,7 @@ class Robot:
         print(f"{self.nom} joue, voici sa main:", end = ' ')
         self.montrer_main()
         if cartes_posees == [None]*4:
-            return self.poser(0) # ICI CHANGER 0 PAR LID DE LA MEILLEURE CARTE A JOUER
+            return self.poser(0, cartes_posees, atout, score) # ICI CHANGER 0 PAR LID DE LA MEILLEURE CARTE A JOUER
         else:
             symbole_demande = next(item for item in cartes_posees if item is not None).symbole # Symbole qui a été demandé
             # Si on a des cartes demandées, on doit jouer une de ces cartes
@@ -73,7 +76,7 @@ class Robot:
                 if carte.symbole == symbole_demande:
                     cartes_symbole_demande.append(i_carte)
             if cartes_symbole_demande != []:
-                return self.choisir_carte_a_poser(cartes_symbole_demande)
+                return self.choisir_carte_a_poser(cartes_symbole_demande, cartes_posees, atout, score)
             # Sinon, si on n'est pas maître, si on peut couper on doit couper
             if not self.est_maitre(cartes_posees, atout):
                 cartes_jouables = []
@@ -82,10 +85,10 @@ class Robot:
                     if carte.symbole == atout:
                         cartes_jouables.append(i_carte)
                 if cartes_jouables != []:
-                    return self.choisir_carte_a_poser(cartes_jouables)
+                    return self.choisir_carte_a_poser(cartes_jouables, cartes_posees, atout, score)
             # Sinon, on joue ce qu'on veut
             cartes_jouables = []
             for i_carte in range(len(self.main)):
                 carte = self.main[i_carte]
                 cartes_jouables.append(i_carte)
-            return self.choisir_carte_a_poser(cartes_jouables)
+            return self.choisir_carte_a_poser(cartes_jouables, cartes_posees, atout, score)

@@ -26,7 +26,7 @@
 
 # TODO Afficher les choix lors des annonces   
 
-# TODO Si quelqu'un mise à 160 on fait passer tout le monde
+# DONE Si quelqu'un mise à 160 on fait passer tout le monde
 
 # TODO Afficher les dernières annonces de chaque joueur
 

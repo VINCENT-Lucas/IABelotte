@@ -86,6 +86,11 @@ def afficher_cartes_ouest(root, dos_photo, nb_cartes):
     frame_ouest.pack(side="left", padx=10)
     afficher_cartes_retournees(frame_ouest, "Ouest", nb_cartes, dos_photo, decalage, orientation="vertical")
 
+def afficher_cartes_sud(root, dos_photo, nb_cartes):
+    frame_sud = tk.Frame(root)
+    frame_sud.pack(side="bottom")
+    afficher_cartes_retournees(frame_sud, "Sud", nb_cartes, dos_photo, orientation="horizontal")
+
 def creer_fenetre():
     root = tk.Tk()
     root.title("Coinche")
@@ -118,6 +123,8 @@ def afficher_cartes_jouees(root, cartes_jouees):
         if carte is not None:
             afficher_carte_jouee(frame_centre, carte)  # Par exemple, affiche la première carte jouée
 
+
+''' Fonction qui permet d'afficher l'ensemble du jeu '''
 def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
     """Affiche la disposition complète des cartes pour tous les joueurs."""
     root = creer_fenetre()
@@ -148,6 +155,81 @@ def afficher_jeu(main_joueur, cartes_jouees, atout, score, cartes_posables):
     # Lancer l'application
     root.mainloop()
     return carte_posee
+
+''' origine est l'endroit d'ou part la carte: 1: nord, 2:est, 3:sud 4:ouest '''
+def afficher_poser_carte(main_joueur, cartes_jouees, atout, score, carte_posee, origine=3):
+    root = creer_fenetre()
+
+    # Créer une frame d'informations (score, atout)
+    frame_info = creer_frame_atout(root, score, atout)
+
+    # Charger l'image du dos de carte et l'image de la carte à jouer
+    dos_photo = charger_image_dos_carte("images/Dos.png")
+    carte_photo = Image.open(carte_posee.get_image())  # Chemin de l'image de la carte jouée
+    carte_photo = carte_photo.resize(DIM_CARTE)
+    carte_photo = ImageTk.PhotoImage(carte_photo)
+
+
+    # Afficher les cartes déjà jouées
+    afficher_cartes_jouees(root, cartes_jouees)
+
+    nb_cartes_sud = len(main_joueur)
+    afficher_cartes_sud(root, dos_photo, nb_cartes_sud)
+
+    # Calculer le nombre de cartes restantes pour chaque joueur
+    nb_cartes_jouees = sum(1 for item in cartes_jouees if item is not None)
+    nb_cartes_nord = len(main_joueur) - int(nb_cartes_jouees >= 2)
+    afficher_cartes_nord(root, dos_photo, nb_cartes_nord)
+
+    nb_cartes_est = len(main_joueur) - int(nb_cartes_jouees >= 1)
+    afficher_cartes_est(root, dos_photo, nb_cartes_est)
+
+    nb_cartes_ouest = len(main_joueur) - int(nb_cartes_jouees >= 3)
+    afficher_cartes_ouest(root, dos_photo, nb_cartes_ouest)
+
+    # --------- Animation de la carte jouée ---------
+    def animer_carte(origine):
+        
+        # Position initiale de la carte en fonction de l'origine (Est, Nord, Ouest)
+        if origine == 2:  # Est
+            x_initial, y_initial = DIM_FENETRE[0] - 20 - DIM_CARTE[0], DIM_FENETRE[1] // 2 - DIM_CARTE[1] // 2
+        elif origine == 1:  # Nord
+            x_initial, y_initial = DIM_FENETRE[0] // 2 - DIM_CARTE[0] // 2, 20
+        elif origine == 4:  # Ouest
+            x_initial, y_initial = 20, DIM_FENETRE[1] // 2 - DIM_CARTE[1] // 2
+        else:  # Default fallback
+            x_initial, y_initial = DIM_FENETRE[0] // 2 - DIM_CARTE[0] // 2 , DIM_FENETRE[1] - DIM_CARTE[1]
+
+        # Position finale (centre de l'écran, où les cartes sont jouées)
+        x_final, y_final = DIM_FENETRE[0] // 2 - DIM_CARTE[0] // 2, DIM_FENETRE[1] // 2 - DIM_CARTE[1] // 2
+
+        # Créer un label pour afficher l'image de la carte
+        carte_label = tk.Label(root, image=carte_photo)
+        carte_label.place(x=x_initial, y=y_initial)
+
+        # Variables pour contrôler le déplacement
+        steps = 20  # Nombre de pas dans l'animation
+        delay = 10  # Délai en millisecondes entre chaque déplacement (total = 20*50 = 1000ms = 1 seconde)
+        dx = (x_final - x_initial) / steps
+        dy = (y_final - y_initial) / steps
+
+        def deplacer_carte(step):
+            if step + 1 <= steps:
+                carte_label.place(x=x_initial + step * dx, y=y_initial + step * dy)
+                root.after(delay, deplacer_carte, step + 1)
+            else:
+                # Attendre 500 ms avant de fermer la fenêtre
+                root.after(500, root.destroy)
+
+        deplacer_carte(0)
+
+    # Lancer l'animation après un petit délai (optionnel, pour rendre la transition plus naturelle)
+    root.after(500, lambda: animer_carte(origine)) 
+
+    # Lancer l'application
+    root.mainloop()
+    return carte_posee
+
 
 def selectionner_annonce(value):
     global annonce_selectionnee
